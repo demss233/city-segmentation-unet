@@ -69,17 +69,24 @@ for epoch in range(epochs):
 
     epoch_losses.append(epoch_loss / len(train_loader))
 
+# Analysing the losses with a simple plot.
 fig, axes = plt.subplots(1, 2, figsize = (10, 5))
 axes[0].plot(step_losses)
 axes[1].plot(epoch_losses)
 
 model_name = "U-Net.pth"
+# Saving the model.
 torch.save(model.state_dict(), model_name)
 
 model_path = "U-Net.pth"
 model_ = UNet(num_classes=num_classes).to(device)
 model_.load_state_dict(torch.load(model_path))
 
+"""
+Evaluating the model: Adding inverse transformations and 
+plotting the results with the original images. Basically the ground truth with 
+out model's segmentation.
+"""
 test_batch_size = 4
 val_loader = get_loaders(batch_size = test_batch_size, dire = val_dir)
 
@@ -94,7 +101,7 @@ inverse_transform = transforms.Compose([
     transforms.Normalize((-0.485 / 0.229, -0.456 / 0.224, -0.406 / 0.225), (1 / 0.229, 1 / 0.224, 1 / 0.225))
 ])
 
-fig, axes = plt.subplots(test_batch_size, 3, figsize=(3 * 5, test_batch_size * 5))
+fig, axes = plt.subplots(test_batch_size, 3, figsize = (3 * 5, test_batch_size * 5))
 
 for i in range(test_batch_size):
     landscape = inverse_transform(X[i]).permute(1, 2, 0).cpu().detach().numpy()
